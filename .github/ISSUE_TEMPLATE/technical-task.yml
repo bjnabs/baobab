@@ -1,0 +1,118 @@
+name: Technical Task
+description: Create a technical implementation task for the Baobab platform.
+title: "[TECH]: "
+labels:
+  - feature
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Technical Task
+
+        Use this form to create engineering and implementation tasks.
+
+        Please complete all relevant fields before submitting.
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: Describe the objective of this technical task.
+      placeholder: What needs to be built or implemented?
+    validations:
+      required: true
+
+  - type: textarea
+    id: business_context
+    attributes:
+      label: Business Context
+      description: Why is this work important to the business?
+      placeholder: Explain the business value.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Backend
+        - Frontend
+        - API
+        - Database
+        - DevOps
+        - Infrastructure
+        - AI
+        - CMS
+        - Commerce
+        - Analytics
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      options:
+        - XS
+        - S
+        - M
+        - L
+        - XL
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Define what must be true before this task is considered complete.
+      placeholder: |
+        - Criterion 1
+        - Criterion 2
+        - Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any prerequisites or blocking tasks.
+      placeholder: Issue #12, ADR-0003, PostgreSQL installation...
+
+  - type: checkboxes
+    id: testing
+    attributes:
+      label: Testing Requirements
+      options:
+        - label: Unit tests required
+        - label: Integration tests required
+        - label: Manual testing required
+        - label: Regression testing required
+
+  - type: checkboxes
+    id: documentation
+    attributes:
+      label: Documentation Updates
+      options:
+        - label: Update README
+        - label: Update Architecture Documentation
+        - label: Update API Documentation
+        - label: No documentation changes required
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Add implementation notes, references or anything useful for the developer.
