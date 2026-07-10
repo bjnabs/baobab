@@ -1,1 +1,136 @@
 
+name: Epic
+description: Create an Epic representing a major body of work spanning multiple features and sprints.
+title: "[EPIC]: "
+labels:
+  - epic
+
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        # Epic
+
+        An Epic represents a significant body of work that delivers strategic business value.
+
+        An Epic may span multiple Features, User Stories, Technical Tasks and Sprints.
+
+  - type: input
+    id: business_area
+    attributes:
+      label: Business Area
+      description: Which business domain does this Epic belong to?
+      placeholder: e.g. Commerce, CMS, Finance, AI Platform
+    validations:
+      required: true
+
+  - type: textarea
+    id: vision
+    attributes:
+      label: Vision
+      description: Describe the desired outcome once this Epic is completed.
+      placeholder: What business capability will exist?
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What business problem does this Epic solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: objectives
+    attributes:
+      label: Objectives
+      description: List the measurable objectives.
+      placeholder: |
+        • Objective 1
+        • Objective 2
+        • Objective 3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: strategic_priority
+    attributes:
+      label: Strategic Priority
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: release
+    attributes:
+      label: Target Release
+      options:
+        - v0.1 Foundation
+        - v0.2 Identity
+        - v0.3 Multi-Tenancy
+        - v0.4 CMS
+        - v0.5 Commerce
+        - Future Release
+    validations:
+      required: true
+
+  - type: input
+    id: milestone
+    attributes:
+      label: Initial Milestone / Sprint
+      placeholder: Sprint 1
+
+  - type: textarea
+    id: features
+    attributes:
+      label: Planned Features
+      description: List the Features expected under this Epic.
+      placeholder: |
+        • Feature A
+        • Feature B
+        • Feature C
+
+  - type: textarea
+    id: success
+    attributes:
+      label: Success Criteria
+      description: How will we know this Epic has been successfully delivered?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Expected Impact
+      options:
+        - label: Customer Experience
+        - label: Operational Efficiency
+        - label: Revenue Growth
+        - label: Security Improvement
+        - label: Performance Improvement
+        - label: Regulatory Compliance
+        - label: Platform Scalability
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List dependent Epics, Features, ADRs or external systems.
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: Identify known risks associated with this Epic.
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Include references, links or other relevant information.
