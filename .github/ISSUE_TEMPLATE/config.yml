@@ -1,1 +1,14 @@
+blank_issues_enabled: false
 
+contact_links:
+  - name: 📚 Baobab Project Documentation
+    url: https://github.com/bjnabs/baobab/wiki
+    about: Read the project documentation before creating an issue.
+
+  - name: 🏛️ Architecture Decision Records (ADRs)
+    url: https://github.com/bjnabs/baobab/tree/main/docs/adr
+    about: Review architecture decisions before proposing technical changes.
+
+  - name: 💬 Project Discussions
+    url: https://github.com/bjnabs/baobab/discussions
+    about: Ask questions, discuss ideas, and seek guidance without opening an issue.
