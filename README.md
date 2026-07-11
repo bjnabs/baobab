@@ -3,18 +3,30 @@
 
 > **Strong Roots. Inspired Growth.**
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/bjnabs/baobab)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/bjnabs/baobab)](https://github.com/bjnabs/baobab/releases)
+[![GitHub Issues](https://img.shields.io/github/issues/bjnabs/baobab)](https://github.com/bjnabs/baobab/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/bjnabs/baobab)](https://github.com/bjnabs/baobab/pulls)
+
 ![Python](https://img.shields.io/badge/Python-3.14-blue)
 ![Django](https://img.shields.io/badge/Django-6.0-092E20)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF)
+![GitHub Codespaces](https://img.shields.io/badge/Codespaces-Supported-181717)
 ![Dev Container](https://img.shields.io/badge/DevContainer-Supported-0db7ed)
-![GitHub Codespaces](https://img.shields.io/badge/GitHub-Codespaces-181717)
-![Status](https://img.shields.io/badge/Status-Active-success)
+
+
+[![Backend CI](https://github.com/bjnabs/baobab/actions/workflows/backend.yml/badge.svg)](https://github.com/bjnabs/baobab/actions/workflows/backend.yml)
+
+[![Frontend CI](https://github.com/bjnabs/baobab/actions/workflows/frontend.yml/badge.svg)](https://github.com/bjnabs/baobab/actions/workflows/frontend.yml)
+
+[![AI Service](https://github.com/bjnabs/baobab/actions/workflows/ai.yml/badge.svg)](https://github.com/bjnabs/baobab/actions/workflows/ai.yml)
+
+[![Security Scan](https://github.com/bjnabs/baobab/actions/workflows/security.yml/badge.svg)](https://github.com/bjnabs/baobab/actions/workflows/security.yml)
+
+[![Release](https://github.com/bjnabs/baobab/actions/workflows/release.yml/badge.svg)](https://github.com/bjnabs/baobab/actions/workflows/release.yml)
 
 **An Enterprise Software Platform for Building Secure, Scalable, Multi-Tenant and AI-Enabled Digital Solutions.**
-
 ---
 
 # Executive Summary
@@ -26,6 +38,28 @@ Unlike traditional monolithic applications, BAOBAB embraces a service-oriented, 
 Built upon modern software engineering principles, BAOBAB incorporates containerised development environments, Infrastructure as Code, continuous integration and delivery pipelines, enterprise security practices, and comprehensive documentation. These capabilities enable development teams to collaborate effectively while delivering reliable, high-quality software.
 
 Whether deployed for a startup, government institution, non-profit organisation, or multinational enterprise, BAOBAB is designed to adapt, scale, and evolve with changing business requirements.
+
+## Table of Contents
+
+- [Project Status](#project-status)
+- [Vision](#vision)
+- [Mission](#mission)
+- [Guiding Principles](#guiding-principles)
+- [Key Features](#key-features)
+- [Technology Stack](#technology-stack)
+- [Enterprise Architecture](#enterprise-architecture)
+- [Repository Structure](#repository-structure)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Security](#security)
+- [Contributing](#contributing)
+- [Community](#community)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+- [Support](#support)
+- [Maintainers](#maintainers)
 
 ---
 
@@ -300,6 +334,17 @@ The repository is organised into logical areas, each serving a distinct responsi
 | `plugins/` | Optional platform extensions, customer integrations, reporting modules, and experimental features. |
 | `tests/` | Cross-platform testing organised by testing discipline rather than by service implementation. |
 
+---
+# Repository Links
+The repository's GitHub features:
+
+- **Issues:** https://github.com/bjnabs/baobab/issues 
+- **Pull Requests:** https://github.com/bjnabs/baobab/pulls 
+- **Actions:** https://github.com/bjnabs/baobab/actions 
+- **Releases:** https://github.com/bjnabs/baobab/releases 
+- **Security:** https://github.com/bjnabs/baobab/security 
+- **Discussions:** https://github.com/bjnabs/baobab/discussions
+  
 ---
 
 # Platform Services
