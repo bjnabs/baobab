@@ -1,44 +1,26 @@
-
 name: Epic
-description: Create an Epic representing a major body of work spanning multiple features and sprints.
-title: "[EPIC]: "
+description: Track a large body of work consisting of multiple related issues.
+title: "[Epic]: "
 labels:
   - epic
-
 body:
 
-  - type: markdown
+  - type: textarea
+    id: summary
     attributes:
-      value: |
-        # Epic
+      label: Summary
+      description: Brief description of the Epic.
+      placeholder: Describe the overall objective.
 
-        An Epic represents a significant body of work that delivers strategic business value.
-
-        An Epic may span multiple Features, User Stories, Technical Tasks and Sprints.
-
-  - type: input
-    id: business_area
-    attributes:
-      label: Business Area
-      description: Which business domain does this Epic belong to?
-      placeholder: e.g. Commerce, CMS, Finance, AI Platform
     validations:
       required: true
 
   - type: textarea
-    id: vision
+    id: business-value
     attributes:
-      label: Vision
-      description: Describe the desired outcome once this Epic is completed.
-      placeholder: What business capability will exist?
-    validations:
-      required: true
+      label: Business Value
+      description: Why is this Epic important?
 
-  - type: textarea
-    id: problem
-    attributes:
-      label: Problem Statement
-      description: What business problem does this Epic solve?
     validations:
       required: true
 
@@ -46,91 +28,56 @@ body:
     id: objectives
     attributes:
       label: Objectives
-      description: List the measurable objectives.
-      placeholder: |
-        • Objective 1
-        • Objective 2
-        • Objective 3
+      description: List the primary objectives.
+
     validations:
       required: true
-
-  - type: dropdown
-    id: strategic_priority
-    attributes:
-      label: Strategic Priority
-      options:
-        - Critical
-        - High
-        - Medium
-        - Low
-    validations:
-      required: true
-
-  - type: dropdown
-    id: release
-    attributes:
-      label: Target Release
-      options:
-        - v0.1 Foundation
-        - v0.2 Identity
-        - v0.3 Multi-Tenancy
-        - v0.4 CMS
-        - v0.5 Commerce
-        - Future Release
-    validations:
-      required: true
-
-  - type: input
-    id: milestone
-    attributes:
-      label: Initial Milestone / Sprint
-      placeholder: Sprint 1
 
   - type: textarea
-    id: features
+    id: scope
     attributes:
-      label: Planned Features
-      description: List the Features expected under this Epic.
-      placeholder: |
-        • Feature A
-        • Feature B
-        • Feature C
+      label: Scope
+      description: What is included?
+
+    validations:
+      required: true
 
   - type: textarea
-    id: success
+    id: out-of-scope
+    attributes:
+      label: Out of Scope
+      description: What is explicitly excluded?
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      description: Expected outputs.
+
+    validations:
+      required: true
+
+  - type: textarea
+    id: child-issues
+    attributes:
+      label: Child Issues
+      description: Link all related issues here.
+
+  - type: textarea
+    id: acceptance
     attributes:
       label: Success Criteria
-      description: How will we know this Epic has been successfully delivered?
+      description: What must be true for this Epic to be complete?
+
     validations:
       required: true
-
-  - type: checkboxes
-    id: impact
-    attributes:
-      label: Expected Impact
-      options:
-        - label: Customer Experience
-        - label: Operational Efficiency
-        - label: Revenue Growth
-        - label: Security Improvement
-        - label: Performance Improvement
-        - label: Regulatory Compliance
-        - label: Platform Scalability
-
-  - type: textarea
-    id: dependencies
-    attributes:
-      label: Dependencies
-      description: List dependent Epics, Features, ADRs or external systems.
 
   - type: textarea
     id: risks
     attributes:
-      label: Risks
-      description: Identify known risks associated with this Epic.
+      label: Risks & Dependencies
 
   - type: textarea
     id: notes
     attributes:
       label: Additional Notes
-      description: Include references, links or other relevant information.
