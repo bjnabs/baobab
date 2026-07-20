@@ -12,11 +12,17 @@ It is used by GitHub Codespaces and Visual Studio Code Dev Containers to ensure 
 
 ```text
 .devcontainer/
+├── .env.example
 ├── devcontainer.json
 ├── README.md
 └── docker/
     ├── Dockerfile
     └── scripts/
+        ├── README.md
+        ├── bootstrap.sh
+        ├── post-create.sh
+        ├── run.sh
+        └── verify.sh
 ```
 
 ---
