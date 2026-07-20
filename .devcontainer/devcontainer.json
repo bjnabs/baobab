@@ -1,1 +1,61 @@
 
+{
+  "name": "BAOBAB Development Environment",
+
+  "build": {
+    "dockerfile": "docker/Dockerfile",
+    "context": ".."
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.13"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "remoteUser": "vscode",
+
+  "postCreateCommand": ".devcontainer/docker/scripts/run.sh",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "editor.rulers": [88],
+        "python.analysis.typeCheckingMode": "basic"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "dart-code.dart-code",
+        "dart-code.flutter",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "editorconfig.editorconfig",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+
+  "forwardPorts": [
+    8000,
+    3000,
+    8001,
+    5432,
+    6379,
+    8025
+  ]
+}
