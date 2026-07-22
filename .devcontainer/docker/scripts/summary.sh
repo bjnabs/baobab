@@ -155,4 +155,4 @@ done
 log_blank
 log_success "BAOBAB Development Environment is ready."
 
-exit 0
+exit 0```````````
