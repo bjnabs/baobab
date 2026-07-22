@@ -1,79 +1,76 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# BAOBAB Development Environment Verification
+# BAOBAB Enterprise Platform
 #
-# Purpose:
-#   Verify that the development container is correctly provisioned.
+# Script      : verify.sh
+# Purpose     : Verifies the BAOBAB Development Environment.
 #
-# This script checks for the availability of required development tools,
-# reports their versions, and exits with a non-zero status if any required
-# dependency is missing.
+# Author      : BAOBAB Contributors
+# License     : Apache License 2.0
+#
+# Notes
+# -----
+# This script orchestrates all verification modules and produces the overall
+# verification result.
 # ==============================================================================
 
 set -Eeuo pipefail
 
-PASS_COUNT=0
-FAIL_COUNT=0
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo
-echo "=================================================="
-echo " BAOBAB Development Environment Verification"
-echo "=================================================="
-echo
+# ------------------------------------------------------------------------------
+# Load Utilities
+# ------------------------------------------------------------------------------
 
-check_command() {
-    local name="$1"
-    local version_command="$2"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/utils/colors.sh"
+source "${SCRIPT_DIR}/utils/functions.sh"
+source "${SCRIPT_DIR}/utils/logging.sh"
+source "${SCRIPT_DIR}/utils/checks.sh"
 
-    printf "%-18s" "${name}"
+log_header "BAOBAB Environment Verification"
 
-    if command -v "${name}" >/dev/null 2>&1; then
-        version=$(eval "${version_command}" 2>/dev/null | head -n 1)
+###############################################################################
+# Verification Modules
+###############################################################################
 
-        printf "✔ Installed"
+log_section "System"
 
-        if [ -n "${version}" ]; then
-            printf " (%s)" "${version}"
-        fi
+bash "${SCRIPT_DIR}/verify/system.sh"
 
-        echo
+log_section "Python"
 
-        PASS_COUNT=$((PASS_COUNT + 1))
-    else
-        echo "✘ Not Installed"
-        FAIL_COUNT=$((FAIL_COUNT + 1))
-    fi
-}
+bash "${SCRIPT_DIR}/verify/python.sh"
 
-echo "Checking required development tools..."
-echo
+log_section "Node.js"
 
-check_command git "git --version"
-check_command python3 "python3 --version"
-check_command node "node --version"
-check_command npm "npm --version"
-check_command java "java --version"
-check_command docker "docker --version"
-check_command gh "gh --version"
-check_command jq "jq --version"
-check_command tree "tree --version"
+bash "${SCRIPT_DIR}/verify/node.sh"
 
-echo
-echo "--------------------------------------------------"
-echo " Verification Summary"
-echo "--------------------------------------------------"
+log_section "Flutter"
 
-echo "Passed : ${PASS_COUNT}"
-echo "Failed : ${FAIL_COUNT}"
+bash "${SCRIPT_DIR}/verify/flutter.sh"
 
-echo
+log_section "Docker"
 
-if [ "${FAIL_COUNT}" -eq 0 ]; then
-    echo "✔ Development environment verification PASSED."
+bash "${SCRIPT_DIR}/verify/docker.sh"
+
+log_section "Database"
+
+bash "${SCRIPT_DIR}/verify/database.sh"
+
+###############################################################################
+# Summary
+###############################################################################
+
+print_check_summary
+
+###############################################################################
+# Exit Status
+###############################################################################
+
+if [[ "${BAOBAB_CHECKS_FAILED}" -eq 0 ]]; then
     exit 0
-else
-    echo "✘ Development environment verification FAILED."
-    exit 1
 fi
 
+exit 1

@@ -1,54 +1,141 @@
-```bash
 #!/usr/bin/env bash
 
 # ==============================================================================
-# BAOBAB Development Container Orchestrator
+# BAOBAB Enterprise Platform
 #
-# Purpose:
-#   Executes the development container provisioning lifecycle in the
-#   prescribed order.
+# Script      : run.sh
+# Purpose     : Main entry point for the BAOBAB Development Environment
+#               Provisioning Framework.
 #
-# Lifecycle:
+# Author      : BAOBAB Contributors
+# License     : Apache License 2.0
 #
-#   bootstrap.sh
-#          │
-#          ▼
-#   post-create.sh
-#          │
-#          ▼
-#     verify.sh
+# Notes
+# -----
+# This script orchestrates the execution of the provisioning framework.
+# ==============================================================================
+#
+# Usage:
+#
+#   ./run.sh
+#   ./run.sh bootstrap
+#   ./run.sh post-create
+#   ./run.sh verify
+#   ./run.sh summary
+#
 # ==============================================================================
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo
-echo "=================================================="
-echo " BAOBAB Development Container Initialisation"
-echo "=================================================="
-echo
+# Load utilities
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/utils/colors.sh"
+source "${SCRIPT_DIR}/utils/functions.sh"
+source "${SCRIPT_DIR}/utils/logging.sh"
 
-run_step() {
-    local script="$1"
+###############################################################################
+# Usage
+###############################################################################
 
-    echo
-    echo "▶ Running ${script}..."
-    echo
+usage() {
 
-    "${SCRIPT_DIR}/${script}"
+cat << EOF
 
-    echo
-    echo "✔ ${script} completed successfully."
+BAOBAB Development Environment Provisioning Framework
+
+Usage:
+
+  run.sh [command]
+
+Commands
+
+  bootstrap      Prepare the workspace.
+  post-create    Execute provisioning.
+  verify         Verify the development environment.
+  summary        Display environment summary.
+  all            Execute the complete workflow.
+
+Examples
+
+  ./run.sh
+  ./run.sh all
+  ./run.sh verify
+
+EOF
+
 }
 
-run_step "bootstrap.sh"
-run_step "post-create.sh"
-run_step "verify.sh"
+###############################################################################
+# Execute
+###############################################################################
 
-echo
-echo "=================================================="
-echo " BAOBAB Development Environment Ready"
-echo "=================================================="
-echo
-```
+run_bootstrap() {
+    bash "${SCRIPT_DIR}/bootstrap.sh"
+}
+
+run_post_create() {
+    bash "${SCRIPT_DIR}/post-create.sh"
+}
+
+run_verify() {
+    bash "${SCRIPT_DIR}/verify.sh"
+}
+
+run_summary() {
+    bash "${SCRIPT_DIR}/summary.sh"
+}
+
+run_all() {
+
+    log_header "BAOBAB Provisioning"
+
+    run_bootstrap
+    run_post_create
+    run_verify
+    run_summary
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+COMMAND="${1:-all}"
+
+case "${COMMAND}" in
+
+    bootstrap)
+        run_bootstrap
+        ;;
+
+    post-create)
+        run_post_create
+        ;;
+
+    verify)
+        run_verify
+        ;;
+
+    summary)
+        run_summary
+        ;;
+
+    all)
+        run_all
+        ;;
+
+    help|-h|--help)
+        usage
+        ;;
+
+    *)
+        log_error "Unknown command: ${COMMAND}"
+        echo
+        usage
+        exit 1
+        ;;
+
+esac
+
+exit 0
