@@ -4,97 +4,97 @@
 # BAOBAB Enterprise Platform
 #
 # Script      : post-create.sh
-# Purpose     : Orchestrates the post-creation provisioning of the BAOBAB
-#               Development Container.
+# Purpose     : Performs post-creation configuration for GitHub Codespaces and
+#               VS Code Dev Containers.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
-#
-# Notes
-# -----
-# This script coordinates all installation, configuration and workspace
-# preparation activities after the Dev Container has been created.
 # ==============================================================================
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ------------------------------------------------------------------------------
-# Load Utilities
-# ------------------------------------------------------------------------------
-
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/utils/colors.sh"
-source "${SCRIPT_DIR}/utils/functions.sh"
-source "${SCRIPT_DIR}/utils/logging.sh"
-
-log_header "BAOBAB Post-Create Provisioning"
-
 ###############################################################################
-# Installation
+# Helper
 ###############################################################################
 
-log_section "Installing Development Tools"
+run_step() {
 
-bash "${SCRIPT_DIR}/install/system.sh"
-bash "${SCRIPT_DIR}/install/python.sh"
-bash "${SCRIPT_DIR}/install/node.sh"
-bash "${SCRIPT_DIR}/install/java.sh"
-bash "${SCRIPT_DIR}/install/flutter.sh"
-bash "${SCRIPT_DIR}/install/docker.sh"
-bash "${SCRIPT_DIR}/install/database.sh"
+    local script="$1"
 
-log_success "Development tools installation completed."
+    if [[ ! -f "${script}" ]]; then
+        echo "Missing script: ${script}"
+        exit 1
+    fi
 
-###############################################################################
-# Configuration
-###############################################################################
+    chmod +x "${script}"
 
-log_section "Configuring Development Environment"
+    echo
+    echo "------------------------------------------------------------"
+    echo "Running $(basename "${script}")"
+    echo "------------------------------------------------------------"
 
-bash "${SCRIPT_DIR}/configure/environment.sh"
-bash "${SCRIPT_DIR}/configure/git.sh"
-bash "${SCRIPT_DIR}/configure/shell.sh"
-bash "${SCRIPT_DIR}/configure/vscode.sh"
-bash "${SCRIPT_DIR}/configure/paths.sh"
-
-log_success "Environment configuration completed."
+    "${script}"
+}
 
 ###############################################################################
-# Workspace
+# Configure Environment
 ###############################################################################
 
-log_section "Preparing Workspace"
+echo
+echo "===================== CONFIGURE ====================="
 
-bash "${SCRIPT_DIR}/workspace/initialize.sh"
-bash "${SCRIPT_DIR}/workspace/directories.sh"
-bash "${SCRIPT_DIR}/workspace/permissions.sh"
-bash "${SCRIPT_DIR}/workspace/cleanup.sh"
+CONFIGURE_SCRIPTS=(
+    environment.sh
+    git.sh
+    shell.sh
+    vscode.sh
+    paths.sh
+)
 
-log_success "Workspace preparation completed."
-
-###############################################################################
-# Verification
-###############################################################################
-
-log_section "Verifying Development Environment"
-
-bash "${SCRIPT_DIR}/verify.sh"
+for script in "${CONFIGURE_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/configure/${script}"
+done
 
 ###############################################################################
-# Summary
+# Prepare Workspace
 ###############################################################################
 
-log_section "Generating Summary"
+echo
+echo "===================== WORKSPACE ====================="
 
-bash "${SCRIPT_DIR}/summary.sh"
+WORKSPACE_SCRIPTS=(
+    initialize.sh
+    directories.sh
+    permissions.sh
+)
+
+for script in "${WORKSPACE_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/workspace/${script}"
+done
 
 ###############################################################################
-# Completion
+# Verify Environment
 ###############################################################################
 
-log_blank
-log_success "BAOBAB Development Environment provisioning completed successfully."
+echo
+echo "====================== VERIFY ======================="
+
+run_step "${SCRIPT_DIR}/verify.sh"
+
+###############################################################################
+# Display Summary
+###############################################################################
+
+echo
+echo "====================== SUMMARY ======================"
+
+run_step "${SCRIPT_DIR}/summary.sh"
+
+echo
+echo "====================================================="
+echo " BAOBAB Dev Container Ready"
+echo "====================================================="
 
 exit 0

@@ -4,73 +4,89 @@
 # BAOBAB Enterprise Platform
 #
 # Script      : verify.sh
-# Purpose     : Verifies the BAOBAB Development Environment.
+# Purpose     : Executes all BAOBAB verification modules.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
-#
-# Notes
-# -----
-# This script orchestrates all verification modules and produces the overall
-# verification result.
 # ==============================================================================
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ------------------------------------------------------------------------------
-# Load Utilities
-# ------------------------------------------------------------------------------
+###############################################################################
+# Helper
+###############################################################################
 
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/utils/colors.sh"
-source "${SCRIPT_DIR}/utils/functions.sh"
-source "${SCRIPT_DIR}/utils/logging.sh"
-source "${SCRIPT_DIR}/utils/checks.sh"
+run_step() {
 
-log_header "BAOBAB Environment Verification"
+    local script="$1"
+
+    if [[ ! -f "${script}" ]]; then
+        echo "Missing verification script: ${script}"
+        exit 1
+    fi
+
+    chmod +x "${script}"
+
+    echo
+    echo "------------------------------------------------------------"
+    echo "Running $(basename "${script}")"
+    echo "------------------------------------------------------------"
+
+    "${script}"
+}
 
 ###############################################################################
 # Verification Modules
 ###############################################################################
 
-log_section "System"
+VERIFY_SCRIPTS=(
+    system.sh
+    python.sh
+    node.sh
+    java.sh
+    flutter.sh
+    docker.sh
+    database.sh
+    workspace.sh
+)
 
-bash "${SCRIPT_DIR}/verify/system.sh"
+echo
+echo "============================================================"
+echo " BAOBAB Development Environment Verification"
+echo "============================================================"
 
-log_section "Python"
+FAILED=0
 
-bash "${SCRIPT_DIR}/verify/python.sh"
+for script in "${VERIFY_SCRIPTS[@]}"; do
 
-log_section "Node.js"
+    if ! run_step "${SCRIPT_DIR}/verify/${script}"; then
+        FAILED=1
+    fi
 
-bash "${SCRIPT_DIR}/verify/node.sh"
-
-log_section "Flutter"
-
-bash "${SCRIPT_DIR}/verify/flutter.sh"
-
-log_section "Docker"
-
-bash "${SCRIPT_DIR}/verify/docker.sh"
-
-log_section "Database"
-
-bash "${SCRIPT_DIR}/verify/database.sh"
-
-###############################################################################
-# Summary
-###############################################################################
-
-print_check_summary
+done
 
 ###############################################################################
-# Exit Status
+# Final Result
 ###############################################################################
 
-if [[ "${BAOBAB_CHECKS_FAILED}" -eq 0 ]]; then
-    exit 0
+echo
+
+if [[ "${FAILED}" -eq 0 ]]; then
+
+    echo "============================================================"
+    echo " All verification modules completed successfully."
+    echo "============================================================"
+
+else
+
+    echo "============================================================"
+    echo " One or more verification modules failed."
+    echo "============================================================"
+
+    exit 1
+
 fi
 
-exit 1
+exit 0

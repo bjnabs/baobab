@@ -4,16 +4,10 @@
 # BAOBAB Enterprise Platform
 #
 # Script      : summary.sh
-# Purpose     : Displays a summary of the BAOBAB Development Environment after
-#               provisioning and verification.
+# Purpose     : Displays a summary of the BAOBAB Development Environment.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
-#
-# Notes
-# -----
-# This script reports the current state of the development environment.
-# It performs no installation or configuration.
 # ==============================================================================
 
 set -Eeuo pipefail
@@ -29,87 +23,103 @@ source "${SCRIPT_DIR}/utils/colors.sh"
 source "${SCRIPT_DIR}/utils/functions.sh"
 source "${SCRIPT_DIR}/utils/logging.sh"
 
-###############################################################################
-# Summary
-###############################################################################
+PROJECT_ROOT="$(get_project_root)"
 
 log_header "BAOBAB Development Environment Summary"
 
 ###############################################################################
-# Environment
+# Operating System
 ###############################################################################
 
-log_section "Environment"
+log_section "Operating System"
 
-log_info "Operating System : $(uname -s)"
-log_info "Architecture     : $(uname -m)"
-log_info "User             : $(whoami)"
-log_info "Project Root     : $(get_project_root)"
-
-###############################################################################
-# Language Runtimes
-###############################################################################
-
-log_section "Language Runtimes"
-
-if command_exists python3; then
-    log_pass "$(python3 --version)"
-else
-    log_fail "Python 3"
-fi
-
-if command_exists uv; then
-    log_pass "$(uv --version)"
-else
-    log_fail "uv"
-fi
-
-if command_exists node; then
-    log_pass "$(node --version)"
-else
-    log_fail "Node.js"
-fi
-
-if command_exists npm; then
-    log_pass "npm $(npm --version)"
-else
-    log_fail "npm"
-fi
-
-if command_exists java; then
-    log_pass "$(java --version | head -n 1)"
-else
-    log_fail "Java"
-fi
-
-if command_exists flutter; then
-    log_pass "$(flutter --version | head -n 1)"
-else
-    log_fail "Flutter"
-fi
+log_info "Kernel       : $(uname -s)"
+log_info "Release      : $(uname -r)"
+log_info "Architecture : $(uname -m)"
 
 ###############################################################################
-# Developer Tools
+# Development Tools
 ###############################################################################
 
-log_section "Developer Tools"
+log_section "Development Tools"
 
-if command_exists git; then
-    log_pass "$(git --version)"
-else
-    log_fail "Git"
+tool_version() {
+    local cmd="$1"
+
+    if command_exists "${cmd}"; then
+        case "${cmd}" in
+            python3) python3 --version ;;
+            node) node --version ;;
+            npm) npm --version ;;
+            java) java --version | head -n 1 ;;
+            javac) javac --version ;;
+            flutter) flutter --version | head -n 1 ;;
+            dart) dart --version 2>&1 ;;
+            docker) docker --version ;;
+            git) git --version ;;
+            uv) uv --version ;;
+            *)
+                "${cmd}" --version 2>/dev/null | head -n 1 || true
+                ;;
+        esac
+    else
+        echo "Not Installed"
+    fi
+}
+
+TOOLS=(
+    git
+    python3
+    uv
+    node
+    npm
+    java
+    javac
+    flutter
+    dart
+    docker
+)
+
+for tool in "${TOOLS[@]}"; do
+    printf "%-12s %s\n" "${tool}" "$(tool_version "${tool}")"
+done
+
+###############################################################################
+# Repository
+###############################################################################
+
+log_section "Repository"
+
+log_info "Project Root : ${PROJECT_ROOT}"
+
+cd "${PROJECT_ROOT}"
+
+if git rev-parse --git-dir >/dev/null 2>&1; then
+
+    log_info "Branch       : $(git branch --show-current)"
+
+    if git diff --quiet; then
+        log_info "Status       : Clean"
+    else
+        log_info "Status       : Modified"
+    fi
+
 fi
 
-if command_exists docker; then
-    log_pass "$(docker --version)"
-else
-    log_fail "Docker"
-fi
+###############################################################################
+# Docker
+###############################################################################
 
-if command_exists gh; then
-    log_pass "$(gh --version | head -n 1)"
+log_section "Docker Services"
+
+if command_exists docker && file_exists "${PROJECT_ROOT}/compose.yaml"; then
+
+    docker compose ps || true
+
 else
-    log_fail "GitHub CLI"
+
+    log_info "Docker Compose not available."
+
 fi
 
 ###############################################################################
@@ -118,15 +128,31 @@ fi
 
 log_section "Workspace"
 
-check_directory "$(get_project_root)"
-check_file "$(get_project_root)/pyproject.toml"
-check_file "$(get_project_root)/compose.yaml"
+FILE_COUNT="$(find "${PROJECT_ROOT}" -type f | wc -l | tr -d ' ')"
+DIRECTORY_COUNT="$(find "${PROJECT_ROOT}" -type d | wc -l | tr -d ' ')"
+
+log_info "Files        : ${FILE_COUNT}"
+log_info "Directories  : ${DIRECTORY_COUNT}"
 
 ###############################################################################
-# Completion
+# Environment Variables
+###############################################################################
+
+log_section "Environment"
+
+for var in BAOBAB_HOME JAVA_HOME ANDROID_HOME; do
+
+    if [[ -n "${!var:-}" ]]; then
+        log_info "${var}=${!var}"
+    fi
+
+done
+
+###############################################################################
+# Finished
 ###############################################################################
 
 log_blank
-log_success "Development environment summary completed."
+log_success "BAOBAB Development Environment is ready."
 
 exit 0
