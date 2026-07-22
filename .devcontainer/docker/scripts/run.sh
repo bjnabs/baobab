@@ -4,135 +4,99 @@
 # BAOBAB Enterprise Platform
 #
 # Script      : run.sh
-# Purpose     : Main entry point for the BAOBAB Development Environment
-#               Provisioning Framework.
+# Purpose     : Entry point for the BAOBAB Dev Container provisioning framework.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
-#
-# Notes
-# -----
-# This script orchestrates the execution of the provisioning framework.
-# ==============================================================================
-#
-# Usage:
-#
-#   ./run.sh
-#   ./run.sh bootstrap
-#   ./run.sh post-create
-#   ./run.sh verify
-#   ./run.sh summary
-#
 # ==============================================================================
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Load utilities
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/utils/colors.sh"
-source "${SCRIPT_DIR}/utils/functions.sh"
-source "${SCRIPT_DIR}/utils/logging.sh"
+# ------------------------------------------------------------------------------
+# Helper
+# ------------------------------------------------------------------------------
 
-###############################################################################
-# Usage
-###############################################################################
+run_script() {
 
-usage() {
+    local script="$1"
 
-cat << EOF
+    if [[ ! -f "${script}" ]]; then
+        echo "Script not found: ${script}"
+        exit 1
+    fi
 
-BAOBAB Development Environment Provisioning Framework
+    chmod +x "${script}"
 
-Usage:
+    echo
+    echo "=============================================================="
+    echo "Running: $(basename "${script}")"
+    echo "=============================================================="
 
-  run.sh [command]
-
-Commands
-
-  bootstrap      Prepare the workspace.
-  post-create    Execute provisioning.
-  verify         Verify the development environment.
-  summary        Display environment summary.
-  all            Execute the complete workflow.
-
-Examples
-
-  ./run.sh
-  ./run.sh all
-  ./run.sh verify
-
-EOF
-
+    "${script}"
 }
 
-###############################################################################
-# Execute
-###############################################################################
+# ------------------------------------------------------------------------------
+# Commands
+# ------------------------------------------------------------------------------
 
-run_bootstrap() {
-    bash "${SCRIPT_DIR}/bootstrap.sh"
-}
-
-run_post_create() {
-    bash "${SCRIPT_DIR}/post-create.sh"
-}
-
-run_verify() {
-    bash "${SCRIPT_DIR}/verify.sh"
-}
-
-run_summary() {
-    bash "${SCRIPT_DIR}/summary.sh"
-}
-
-run_all() {
-
-    log_header "BAOBAB Provisioning"
-
-    run_bootstrap
-    run_post_create
-    run_verify
-    run_summary
-}
-
-###############################################################################
-# Main
-###############################################################################
-
-COMMAND="${1:-all}"
-
-case "${COMMAND}" in
+case "${1:-post-create}" in
 
     bootstrap)
-        run_bootstrap
+
+        run_script "${SCRIPT_DIR}/bootstrap.sh"
         ;;
 
     post-create)
-        run_post_create
+
+        run_script "${SCRIPT_DIR}/post-create.sh"
         ;;
 
     verify)
-        run_verify
+
+        run_script "${SCRIPT_DIR}/verify.sh"
         ;;
 
     summary)
-        run_summary
-        ;;
 
-    all)
-        run_all
+        run_script "${SCRIPT_DIR}/summary.sh"
         ;;
 
     help|-h|--help)
-        usage
+
+        cat <<EOF
+
+BAOBAB Dev Container
+
+Usage
+
+    run.sh [command]
+
+Commands
+
+    bootstrap      Complete machine provisioning
+
+    post-create    Configure the workspace after the container starts
+                   (Default)
+
+    verify         Execute every verification module
+
+    summary        Display an environment summary
+
+    help           Show this help
+
+EOF
         ;;
 
     *)
-        log_error "Unknown command: ${COMMAND}"
+
+        echo "Unknown command: ${1}"
+
         echo
-        usage
+
+        "${BASH_SOURCE%/*}/run.sh" help
+
         exit 1
         ;;
 

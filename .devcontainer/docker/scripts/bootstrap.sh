@@ -4,69 +4,132 @@
 # BAOBAB Enterprise Platform
 #
 # Script      : bootstrap.sh
-# Purpose     : Prepares the development environment prior to provisioning.
+# Purpose     : Performs complete provisioning of the BAOBAB Development
+#               Environment.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
-#
-# Notes
-# -----
-# This script performs initial workspace preparation before the post-create
-# process begins.
 # ==============================================================================
 
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Load utilities
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/utils/colors.sh"
-source "${SCRIPT_DIR}/utils/functions.sh"
-source "${SCRIPT_DIR}/utils/logging.sh"
-
-log_header "BAOBAB Bootstrap"
-
-PROJECT_ROOT="$(get_project_root)"
-
-log_info "Project root: ${PROJECT_ROOT}"
-
 ###############################################################################
-# Workspace Preparation
+# Helper
 ###############################################################################
 
-log_section "Preparing Workspace"
+run_step() {
 
-ensure_directory "${PROJECT_ROOT}/.cache"
-ensure_directory "${PROJECT_ROOT}/.logs"
-ensure_directory "${PROJECT_ROOT}/.tmp"
+    local script="$1"
 
-log_success "Workspace directories verified."
+    if [[ ! -f "${script}" ]]; then
+        echo "Missing script: ${script}"
+        exit 1
+    fi
 
-###############################################################################
-# Script Permissions
-###############################################################################
+    chmod +x "${script}"
 
-log_section "Setting Script Permissions"
+    echo
+    echo "=================================================================="
+    echo "Running $(basename "${script}")"
+    echo "=================================================================="
 
-find "${SCRIPT_DIR}" -type f -name "*.sh" -exec chmod +x {} \;
-
-log_success "Script permissions verified."
-
-###############################################################################
-# Environment
-###############################################################################
-
-log_section "Environment"
-
-log_info "Operating System : $(uname -s)"
-log_info "Architecture     : $(uname -m)"
-log_info "Current User     : $(whoami)"
-log_info "Working Directory: ${PROJECT_ROOT}"
+    "${script}"
+}
 
 ###############################################################################
-# Complete
+# Install
 ###############################################################################
 
-log_blank
-log_success "Bootstrap completed successfully."
+echo
+echo "====================== INSTALL ======================"
+
+INSTALL_SCRIPTS=(
+    system.sh
+    python.sh
+    node.sh
+    java.sh
+    flutter.sh
+    docker.sh
+    database.sh
+)
+
+for script in "${INSTALL_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/install/${script}"
+done
+
+###############################################################################
+# Configure
+###############################################################################
+
+echo
+echo "===================== CONFIGURE ====================="
+
+CONFIGURE_SCRIPTS=(
+    environment.sh
+    git.sh
+    shell.sh
+    vscode.sh
+    paths.sh
+)
+
+for script in "${CONFIGURE_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/configure/${script}"
+done
+
+###############################################################################
+# Workspace
+###############################################################################
+
+echo
+echo "===================== WORKSPACE ====================="
+
+WORKSPACE_SCRIPTS=(
+    initialize.sh
+    directories.sh
+    permissions.sh
+    cleanup.sh
+)
+
+for script in "${WORKSPACE_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/workspace/${script}"
+done
+
+###############################################################################
+# Verify
+###############################################################################
+
+echo
+echo "====================== VERIFY ======================="
+
+VERIFY_SCRIPTS=(
+    system.sh
+    python.sh
+    node.sh
+    java.sh
+    flutter.sh
+    docker.sh
+    database.sh
+    workspace.sh
+)
+
+for script in "${VERIFY_SCRIPTS[@]}"; do
+    run_step "${SCRIPT_DIR}/verify/${script}"
+done
+
+###############################################################################
+# Summary
+###############################################################################
+
+echo
+echo "====================== SUMMARY ======================"
+
+run_step "${SCRIPT_DIR}/summary.sh"
+
+echo
+echo "====================================================="
+echo " BAOBAB Development Environment Ready"
+echo "====================================================="
+
+exit 0

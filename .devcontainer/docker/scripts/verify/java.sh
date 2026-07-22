@@ -3,9 +3,9 @@
 # ==============================================================================
 # BAOBAB Enterprise Platform
 #
-# Script      : permissions.sh
-# Purpose     : Applies standard file and directory permissions to the BAOBAB
-#               workspace.
+# Script      : java.sh
+# Purpose     : Verifies the Java Development Kit (JDK) installation and
+#               configuration for the BAOBAB Development Environment.
 #
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
@@ -23,104 +23,137 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../utils/colors.sh"
 source "${SCRIPT_DIR}/../utils/functions.sh"
 source "${SCRIPT_DIR}/../utils/logging.sh"
+source "${SCRIPT_DIR}/../utils/checks.sh"
 
-log_header "Workspace Permissions"
+log_header "Java Verification"
 
-PROJECT_ROOT="$(get_project_root)"
-
-###############################################################################
-# Validate Workspace
-###############################################################################
-
-log_section "Workspace"
-
-if [[ ! -d "${PROJECT_ROOT}" ]]; then
-    log_error "Workspace not found."
-    exit 1
-fi
+FAILED=0
 
 ###############################################################################
-# Make Shell Scripts Executable
+# Java Runtime
 ###############################################################################
 
-log_section "Shell Scripts"
+log_section "Java Runtime"
 
-SCRIPT_ROOT="${PROJECT_ROOT}/.devcontainer/docker/scripts"
+if command_exists java; then
 
-if [[ -d "${SCRIPT_ROOT}" ]]; then
-
-    find "${SCRIPT_ROOT}" -type f -name "*.sh" -exec chmod +x {} \;
-
-    log_success "Shell scripts are executable."
+    log_pass "Java Runtime"
+    log_info "$(java --version | head -n 1)"
 
 else
 
-    log_warning "Scripts directory not found."
+    log_fail "Java Runtime"
+    FAILED=1
 
 fi
 
 ###############################################################################
-# Make Utility Scripts Executable
+# Java Compiler
 ###############################################################################
 
-log_section "Repository Scripts"
+log_section "Java Compiler"
 
-REPOSITORY_SCRIPTS="${PROJECT_ROOT}/infrastructure/scripts"
+if command_exists javac; then
 
-if [[ -d "${REPOSITORY_SCRIPTS}" ]]; then
-
-    find "${REPOSITORY_SCRIPTS}" -type f -name "*.sh" -exec chmod +x {} \;
-
-    log_success "Infrastructure scripts are executable."
+    log_pass "Java Compiler"
+    log_info "$(javac --version)"
 
 else
 
-    log_info "No infrastructure scripts found."
+    log_fail "Java Compiler"
+    FAILED=1
 
 fi
 
 ###############################################################################
-# Directory Permissions
+# JAVA_HOME
 ###############################################################################
 
-log_section "Directory Permissions"
+log_section "JAVA_HOME"
 
-find "${PROJECT_ROOT}" \
-    -type d \
-    -exec chmod 755 {} \;
+if [[ -n "${JAVA_HOME:-}" ]]; then
 
-log_success "Directory permissions updated."
+    log_pass "JAVA_HOME"
+    log_info "${JAVA_HOME}"
 
-###############################################################################
-# File Permissions
-###############################################################################
+    if [[ -d "${JAVA_HOME}" ]]; then
+        log_pass "JAVA_HOME directory"
+    else
+        log_warning "JAVA_HOME points to a non-existent directory."
+    fi
 
-log_section "File Permissions"
+else
 
-find "${PROJECT_ROOT}" \
-    -type f \
-    ! -name "*.sh" \
-    -exec chmod 644 {} \;
+    log_warning "JAVA_HOME is not configured."
 
-log_success "File permissions updated."
+fi
 
 ###############################################################################
-# Git Executable Bit
+# PATH Verification
 ###############################################################################
 
-log_section "Git Index"
+log_section "PATH"
 
-cd "${PROJECT_ROOT}"
+JAVA_BINARY="$(command -v java || true)"
 
-git update-index --refresh >/dev/null 2>&1 || true
+if [[ -n "${JAVA_BINARY}" ]]; then
 
-log_success "Git index refreshed."
+    log_info "Java executable: ${JAVA_BINARY}"
+
+else
+
+    log_warning "Java executable not found on PATH."
+
+fi
+
+###############################################################################
+# JDK Verification
+###############################################################################
+
+log_section "JDK"
+
+if command_exists jar; then
+
+    log_pass "jar"
+    log_info "$(jar --version)"
+
+else
+
+    log_warning "jar utility not available."
+
+fi
+
+###############################################################################
+# Android Compatibility
+###############################################################################
+
+log_section "Android Toolchain"
+
+if [[ -n "${ANDROID_HOME:-}" ]]; then
+
+    log_info "ANDROID_HOME=${ANDROID_HOME}"
+
+else
+
+    log_info "ANDROID_HOME is not configured (expected until Android SDK is installed)."
+
+fi
 
 ###############################################################################
 # Summary
 ###############################################################################
 
-log_blank
-log_success "Workspace permissions configured successfully."
+if [[ "${FAILED}" -eq 0 ]]; then
+
+    log_blank
+    log_success "Java verification completed successfully."
+
+else
+
+    log_blank
+    log_error "Java verification failed."
+    exit 1
+
+fi
 
 exit 0
