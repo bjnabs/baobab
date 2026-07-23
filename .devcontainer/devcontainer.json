@@ -7,22 +7,23 @@
   },
 
   "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.13"
-    },
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "22"
-    },
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "21"
-    },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
   "remoteUser": "vscode",
 
+  "overrideCommand": false,
+
+  "updateRemoteUserUID": true,
+
   "postCreateCommand": "bash .devcontainer/docker/scripts/run.sh",
+
+  "shutdownAction": "stopContainer",
+
+  "containerEnv": {
+    "BAOBAB_ENV": "development"
+  },
 
   "customizations": {
     "vscode": {
@@ -33,13 +34,21 @@
           "source.organizeImports": "explicit",
           "source.fixAll": "explicit"
         },
+
         "editor.rulers": [88],
         "editor.renderWhitespace": "selection",
+
         "files.trimTrailingWhitespace": true,
         "files.insertFinalNewline": true,
         "files.eol": "\n",
+
         "terminal.integrated.defaultProfile.linux": "bash",
-        "python.analysis.typeCheckingMode": "basic"
+
+        "python.analysis.typeCheckingMode": "basic",
+
+        "git.autofetch": true,
+
+        "docker.showStartPage": false
       },
 
       "extensions": [
@@ -78,20 +87,25 @@
       "label": "Next.js Frontend",
       "onAutoForward": "notify"
     },
+
     "5432": {
       "label": "PostgreSQL"
     },
+
     "6379": {
       "label": "Redis"
     },
+
     "8000": {
       "label": "Django Backend",
       "onAutoForward": "openBrowser"
     },
+
     "8001": {
       "label": "FastAPI AI Service",
       "onAutoForward": "notify"
     },
+
     "8025": {
       "label": "Mailpit"
     }
