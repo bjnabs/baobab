@@ -35,23 +35,38 @@
 # License : Apache License 2.0
 # ==============================================================================
 
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04 AS development
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-26.04 AS development
 
 # ------------------------------------------------------------------------------
-# Image Metadata
+# Build Metadata
 # ------------------------------------------------------------------------------
 
-LABEL org.opencontainers.image.title="BAOBAB Development Environment"
-LABEL org.opencontainers.image.description="Development container for the BAOBAB Enterprise Platform."
-LABEL org.opencontainers.image.vendor="NabHold Group Africa"
-LABEL org.opencontainers.image.authors="BAOBAB Engineering Team"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
+ARG VERSION="0.1.0-dev"
+ARG BUILD_DATE="unknown"
+ARG VCS_REF="unknown"
+ARG BAOBAB_PROVISIONER_VERSION="1.0.0"
+
+LABEL org.opencontainers.image.title="BAOBAB Development Environment" \
+      org.opencontainers.image.description="Development container for the BAOBAB Enterprise Platform." \
+      org.opencontainers.image.vendor="NabHold Group Africa" \
+      org.opencontainers.image.authors="BAOBAB Engineering Team" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.source="https://github.com/bjnabs/baobab" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}"
+
+
+LABEL io.baobab.provisioner.version="${BAOBAB_PROVISIONER_VERSION}"
+
+
 
 # ------------------------------------------------------------------------------
 # Environment
 # ------------------------------------------------------------------------------
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV BAOBAB_PROVISIONER_VERSION="${BAOBAB_PROVISIONER_VERSION}"
 
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \

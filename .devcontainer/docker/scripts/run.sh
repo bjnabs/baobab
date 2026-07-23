@@ -6,6 +6,12 @@
 # Script      : run.sh
 # Purpose     : Entry point for the BAOBAB Dev Container provisioning framework.
 #
+# Description :
+#   Dispatches high-level provisioning commands to the appropriate orchestration
+#   scripts. This script intentionally contains no installation or provisioning
+#   logic and serves only as the single entry point into the BAOBAB development
+#   environment.
+#
 # Author      : BAOBAB Contributors
 # License     : Apache License 2.0
 # ==============================================================================
@@ -15,57 +21,12 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ------------------------------------------------------------------------------
-# Helper
+# Display Help
 # ------------------------------------------------------------------------------
 
-run_script() {
+show_help() {
 
-    local script="$1"
-
-    if [[ ! -f "${script}" ]]; then
-        echo "Script not found: ${script}"
-        exit 1
-    fi
-
-    chmod +x "${script}"
-
-    echo
-    echo "=============================================================="
-    echo "Running: $(basename "${script}")"
-    echo "=============================================================="
-
-    "${script}"
-}
-
-# ------------------------------------------------------------------------------
-# Commands
-# ------------------------------------------------------------------------------
-
-case "${1:-post-create}" in
-
-    bootstrap)
-
-        run_script "${SCRIPT_DIR}/bootstrap.sh"
-        ;;
-
-    post-create)
-
-        run_script "${SCRIPT_DIR}/post-create.sh"
-        ;;
-
-    verify)
-
-        run_script "${SCRIPT_DIR}/verify.sh"
-        ;;
-
-    summary)
-
-        run_script "${SCRIPT_DIR}/summary.sh"
-        ;;
-
-    help|-h|--help)
-
-        cat <<EOF
+cat <<EOF
 
 BAOBAB Dev Container
 
@@ -87,16 +48,63 @@ Commands
     help           Show this help
 
 EOF
+
+}
+
+# ------------------------------------------------------------------------------
+# Execute Script
+# ------------------------------------------------------------------------------
+
+run_script() {
+
+    local script="$1"
+
+    if [[ ! -f "$script" ]]; then
+        echo "ERROR: Script not found:"
+        echo "  $script"
+        exit 1
+    fi
+
+    echo
+    echo "=============================================================="
+    echo "Running: $(basename "$script")"
+    echo "=============================================================="
+    echo
+
+    # Execute explicitly with Bash to avoid dependency on executable bits.
+    bash "$script"
+}
+
+# ------------------------------------------------------------------------------
+# Command Dispatcher
+# ------------------------------------------------------------------------------
+
+case "${1:-post-create}" in
+
+    bootstrap)
+        run_script "${SCRIPT_DIR}/bootstrap.sh"
+        ;;
+
+    post-create)
+        run_script "${SCRIPT_DIR}/post-create.sh"
+        ;;
+
+    verify)
+        run_script "${SCRIPT_DIR}/verify.sh"
+        ;;
+
+    summary)
+        run_script "${SCRIPT_DIR}/summary.sh"
+        ;;
+
+    help|-h|--help)
+        show_help
         ;;
 
     *)
-
-        echo "Unknown command: ${1}"
-
+        echo "ERROR: Unknown command: ${1}"
         echo
-
-        "${BASH_SOURCE%/*}/run.sh" help
-
+        show_help
         exit 1
         ;;
 

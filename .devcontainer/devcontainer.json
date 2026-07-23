@@ -2,8 +2,13 @@
   "name": "BAOBAB Development Environment",
 
   "build": {
+    "context": "..",
     "dockerfile": "docker/Dockerfile",
-    "context": ".."
+    "target": "development",
+    "args": {
+      "UBUNTU_VERSION": "26.04",
+      "BAOBAB_ENV": "development"
+    }
   },
 
   "features": {
@@ -17,25 +22,45 @@
 
   "updateRemoteUserUID": true,
 
-  "postCreateCommand": "bash .devcontainer/docker/scripts/run.sh",
-
   "shutdownAction": "stopContainer",
 
+  "runArgs": [
+    "--shm-size=2g"
+  ],
+
+  "mounts": [
+    "source=baobab-pip-cache,target=/home/vscode/.cache/pip,type=volume",
+    "source=baobab-uv-cache,target=/home/vscode/.cache/uv,type=volume"
+  ],
+
   "containerEnv": {
-    "BAOBAB_ENV": "development"
+    "BAOBAB_ENV": "development",
+    "PYTHONUNBUFFERED": "1",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "UV_LINK_MODE": "copy"
   },
+
+  "postCreateCommand": "bash .devcontainer/docker/scripts/run.sh bootstrap",
+
+  "updateContentCommand": "bash .devcontainer/docker/scripts/run.sh post-create",
+
+  "postStartCommand": "bash .devcontainer/docker/scripts/summary.sh",
 
   "customizations": {
     "vscode": {
       "settings": {
         "editor.formatOnSave": true,
         "editor.formatOnSaveMode": "file",
+
         "editor.codeActionsOnSave": {
           "source.organizeImports": "explicit",
           "source.fixAll": "explicit"
         },
 
-        "editor.rulers": [88],
+        "editor.rulers": [
+          88
+        ],
+
         "editor.renderWhitespace": "selection",
 
         "files.trimTrailingWhitespace": true,
