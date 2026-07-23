@@ -26,7 +26,27 @@ source "${SCRIPT_DIR}/../utils/logging.sh"
 
 log_header "Environment Configuration"
 
+###############################################################################
+# Determine Project Root
+###############################################################################
+
 PROJECT_ROOT="$(get_project_root)"
+
+if [[ -z "${PROJECT_ROOT}" ]]; then
+
+    log_error "Unable to determine the BAOBAB project root."
+    exit 1
+
+fi
+
+if [[ ! -d "${PROJECT_ROOT}" ]]; then
+
+    log_error "Invalid project root: ${PROJECT_ROOT}"
+    exit 1
+
+fi
+
+log_info "Project Root : ${PROJECT_ROOT}"
 
 ###############################################################################
 # Project Environment
@@ -66,9 +86,7 @@ LOCAL_BIN='export PATH="$HOME/.local/bin:$PATH"'
 
 if ! grep -Fxq "${LOCAL_BIN}" "${HOME}/.bashrc"; then
 
-    echo "" >> "${HOME}/.bashrc"
-    echo "# BAOBAB Local Tools" >> "${HOME}/.bashrc"
-    echo "${LOCAL_BIN}" >> "${HOME}/.bashrc"
+    printf '\n# BAOBAB Local Tools\n%s\n' "${LOCAL_BIN}" >> "${HOME}/.bashrc"
 
     log_success "Added ~/.local/bin to PATH."
 
@@ -84,31 +102,40 @@ fi
 
 log_section "BAOBAB Variables"
 
+#
+# Export immediately for the current provisioning process.
+#
+
+export PROJECT_ROOT
+export BAOBAB_HOME="${PROJECT_ROOT}"
+export BAOBAB_ENV="development"
+
 declare -A VARIABLES=(
-    ["BAOBAB_HOME"]="${PROJECT_ROOT}"
-    ["BAOBAB_ENV"]="development"
+    ["PROJECT_ROOT"]="${PROJECT_ROOT}"
+    ["BAOBAB_HOME"]="${BAOBAB_HOME}"
+    ["BAOBAB_ENV"]="${BAOBAB_ENV}"
 )
 
 for VARIABLE in "${!VARIABLES[@]}"; do
 
     VALUE="${VARIABLES[$VARIABLE]}"
 
-    if ! grep -q "^export ${VARIABLE}=" "${HOME}/.bashrc"; then
+    if grep -q "^export ${VARIABLE}=" "${HOME}/.bashrc"; then
 
-        echo "export ${VARIABLE}=\"${VALUE}\"" >> "${HOME}/.bashrc"
-
-        log_success "${VARIABLE} configured."
+        log_info "${VARIABLE} already configured."
 
     else
 
-        log_info "${VARIABLE} already configured."
+        printf 'export %s="%s"\n' "${VARIABLE}" "${VALUE}" >> "${HOME}/.bashrc"
+
+        log_success "${VARIABLE} configured."
 
     fi
 
 done
 
 ###############################################################################
-# Load Environment
+# Reload Environment
 ###############################################################################
 
 log_section "Reload Environment"
@@ -117,6 +144,16 @@ log_section "Reload Environment"
 source "${HOME}/.bashrc"
 
 log_success "Shell environment reloaded."
+
+###############################################################################
+# Summary
+###############################################################################
+
+log_section "Environment Summary"
+
+log_info "PROJECT_ROOT : ${PROJECT_ROOT}"
+log_info "BAOBAB_HOME : ${BAOBAB_HOME}"
+log_info "BAOBAB_ENV  : ${BAOBAB_ENV}"
 
 ###############################################################################
 # Complete
